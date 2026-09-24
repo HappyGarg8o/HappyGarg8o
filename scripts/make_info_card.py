@@ -61,8 +61,9 @@ def main():
     body = []
     style = ""
     if not STATIC:
-        style = (".ln{opacity:0;animation:in .45s ease-out forwards}"
-                 "@keyframes in{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}")
+        style = (".ln{animation:in .45s ease-out both}"
+                 "@keyframes in{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}"
+                 "@media (prefers-reduced-motion:reduce){.ln{animation:none}}")
     for i, r in enumerate(rows + ["SWATCH"]):
         y = top + i * LINE
         delay = 0.25 + i * 0.11

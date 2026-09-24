@@ -27,18 +27,23 @@ START = 0.35
 
 # ---------------------------------------------------------------- animation
 def row_group(i, x0, y0, width, height, inner, begin):
-    """Wrap one row in a clip that wipes left to right, with a block cursor riding the edge."""
+    """Wrap one row in a clip that wipes left to right, with a block cursor riding the edge.
+
+    Every animation starts at t=0 and encodes its delay in keyTimes, so the art's
+    base state is fully drawn. If a viewer can't run SMIL, it just shows the final frame.
+    """
     if STATIC:
         return f"<g>{inner}</g>"
     cid = f"r{i}"
-    end = begin + ROW_DUR
-    return f"""<clipPath id="{cid}"><rect x="{x0}" y="{y0 - 1}" width="0" height="{height + 2}">
-<animate attributeName="width" from="0" to="{width + 2}" begin="{begin:.2f}s" dur="{ROW_DUR}s" fill="freeze"/></rect></clipPath>
+    T = begin + ROW_DUR
+    k = begin / T
+    cw = max(4, height * 0.55)
+    return f"""<clipPath id="{cid}"><rect x="{x0}" y="{y0 - 1}" width="{width + 2}" height="{height + 2}">
+<animate attributeName="width" values="0;0;{width + 2}" keyTimes="0;{k:.4f};1" dur="{T:.2f}s" fill="freeze"/></rect></clipPath>
 <g clip-path="url(#{cid})">{inner}</g>
-<rect x="{x0}" y="{y0}" width="{max(4, height * 0.55):.1f}" height="{height}" fill="{GREEN}" opacity="0">
-<set attributeName="opacity" to="0.9" begin="{begin:.2f}s"/>
-<animate attributeName="x" from="{x0}" to="{x0 + width}" begin="{begin:.2f}s" dur="{ROW_DUR}s" fill="freeze"/>
-<set attributeName="opacity" to="0" begin="{end:.2f}s"/></rect>"""
+<rect x="{x0}" y="{y0}" width="{cw:.1f}" height="{height}" fill="{GREEN}" opacity="0">
+<animate attributeName="opacity" values="0;0.9;0" keyTimes="0;{k:.4f};1" calcMode="discrete" dur="{T:.2f}s" fill="freeze"/>
+<animate attributeName="x" values="{x0};{x0};{x0 + width}" keyTimes="0;{k:.4f};1" dur="{T:.2f}s" fill="freeze"/></rect>"""
 
 
 def prompt_line(x, y, cmd, begin):
@@ -47,13 +52,14 @@ def prompt_line(x, y, cmd, begin):
            f'<tspan fill="{DIM}"> ~ $ </tspan><tspan fill="{TEXT}">{esc(cmd)}</tspan></text>')
     if STATIC:
         return txt
-    return (f'<g opacity="0"><set attributeName="opacity" to="1" begin="{begin:.2f}s"/>{txt}</g>')
+    return f'<g><animate attributeName="opacity" values="0" dur="{begin:.2f}s"/>{txt}</g>'
 
 
 def blinking_cursor(x, y, begin):
+    rect = f'<rect x="{x}" y="{y - 11}" width="7.5" height="14" fill="{GREEN}"'
     if STATIC:
-        return f'<rect x="{x}" y="{y - 11}" width="7.5" height="14" fill="{GREEN}"/>'
-    return (f'<rect x="{x}" y="{y - 11}" width="7.5" height="14" fill="{GREEN}" opacity="0">'
+        return rect + "/>"
+    return (rect + f'><animate attributeName="opacity" values="0" dur="{begin:.2f}s"/>'
             f'<animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.5;0.5;1" dur="1.1s" '
             f'begin="{begin:.2f}s" repeatCount="indefinite"/></rect>')
 

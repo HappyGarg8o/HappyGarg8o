@@ -91,11 +91,12 @@ def main():
     if not STATIC:
         maxd = ncols + 7
         step = 0.028
-        style = (".c{opacity:0;transform-box:fill-box;animation:drop .5s cubic-bezier(.2,.8,.2,1) forwards}"
+        style = (".c{transform-box:fill-box;animation:drop .5s cubic-bezier(.2,.8,.2,1) both}"
                  "@keyframes drop{from{opacity:0;transform:translateY(-7px) scale(.6)}to{opacity:1;transform:none}}"
                  + "".join(f".d{k}{{animation-delay:{0.15 + k * step:.3f}s}}" for k in range(maxd))
-                 + f".foot{{opacity:0;animation:fade .6s ease-out {0.15 + maxd * step:.2f}s forwards}}"
-                 "@keyframes fade{to{opacity:1}}")
+                 + f".foot{{animation:fade .6s ease-out {0.15 + maxd * step:.2f}s both}}"
+                 "@keyframes fade{from{opacity:0}to{opacity:1}}"
+                 "@media (prefers-reduced-motion:reduce){.c,.foot{animation:none}}")
     OUT.write_text(window(W, h, "happy@github: ~/contributions", body, style=style))
     print(f"wrote {OUT.name} ({ncols} weeks)")
 
