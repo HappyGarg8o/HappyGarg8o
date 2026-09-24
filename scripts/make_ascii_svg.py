@@ -136,55 +136,107 @@ def build_banner(words=("HAPPY", "GARG")):
 
 
 # ----------------------------------------------------------- portrait mode
-RAMP = " .`:-=+*cs#%@"  # bright (sparse) -> dark (dense)
+# Light text on a dark terminal: brighter pixels get denser glyphs.
+RAMP = " .,:;-=+*oxO#%@"
 
 
 def prep_photo(path):
-    """Isolate the subject, boost local contrast, put it on white."""
+    """Cut the subject out, crop to head and shoulders, boost local contrast.
+
+    Returns (gray, mask) as float arrays in 0..1.
+    """
     import cv2
     import numpy as np
     from PIL import Image
 
     img = Image.open(path).convert("RGBA")
     try:
-        from rembg import remove  # optional, big dependency
-        img = remove(img)
-    except Exception:
-        pass
-    white = Image.new("RGBA", img.size, (255, 255, 255, 255))
-    gray = np.array(Image.alpha_composite(white, img).convert("L"))
-    clahe = cv2.createCLAHE(clipLimit=2.5, tileGridSize=(8, 8))
-    return clahe.apply(gray)
+        from rembg import new_session, remove  # optional, big dependency
+        img = remove(img, session=new_session("u2net_human_seg"))
+    except Exception as e:  # no rembg: keep the photo, use a full mask
+        print(f"(rembg unavailable, keeping background: {e})")
+    rgba = np.array(img)
+    alpha = rgba[:, :, 3].astype(float) / 255
+    ys, xs = np.where(alpha > 0.15)
+    # centre on the head: the widest rows near the top are the head, not the shoulders
+    top_rows = alpha[ys.min(): ys.min() + int(0.45 * (ys.max() - ys.min()))] > 0.5
+    hx = np.where(top_rows.any(axis=0))[0]
+    cx, head_w = (hx.min() + hx.max()) / 2, hx.max() - hx.min()
+    half = int(head_w * CROP_WIDTH / 2)
+    x0, x1 = max(0, int(cx - half)), min(alpha.shape[1], int(cx + half))
+    y0 = max(0, ys.min() - int(0.02 * head_w))
+    y1 = min(rgba.shape[0], y0 + int((x1 - x0) * CROP_ASPECT))
+    rgba, alpha = rgba[y0:y1, x0:x1], alpha[y0:y1, x0:x1]
+
+    gray = cv2.cvtColor(rgba[:, :, :3], cv2.COLOR_RGB2GRAY)
+    gray = cv2.createCLAHE(clipLimit=1.6, tileGridSize=(4, 4)).apply(gray)
+    # sharpen, then mix in edges so glasses, eyes and jawline survive downsampling
+    blur = cv2.GaussianBlur(gray, (0, 0), 3)
+    gray = cv2.addWeighted(gray, 1.8, blur, -0.8, 0).astype(float)
+    edges = cv2.Canny(cv2.GaussianBlur(rgba[:, :, :3], (0, 0), 1.5), 40, 110).astype(float)
+    edges = cv2.GaussianBlur(edges, (0, 0), 2.5)
+    inside = gray[alpha > 0.5]
+    lo, hi = np.percentile(inside, 5), np.percentile(inside, 99.7)
+    gray = np.clip((gray - lo) / (hi - lo), 0, 1) ** 1.2
+    gray = np.clip(gray + 0.55 * edges / max(edges.max(), 1), 0, 1)
+    return gray, alpha
 
 
-def build_portrait(photo, cols=58):
+CROP_ASPECT = 1.12  # crop height / width
+CROP_WIDTH = 1.45   # crop width as a multiple of head width
+
+
+def _mix(c1, c2, t):
+    a = [int(c1[i:i + 2], 16) for i in (1, 3, 5)]
+    b = [int(c2[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join(f"{round(x + (y - x) * t):02x}" for x, y in zip(a, b))
+
+
+def build_portrait(photo, cols=92):
     import numpy as np
     from PIL import Image
 
-    gray = prep_photo(photo)
-    h, w = gray.shape
-    top, bottom = 56 + 16, H - 44
-    avail_h = bottom - top
-    char_w = (W - 36) / cols
-    char_h = char_w * 1.9
-    rows = int(avail_h / char_h)
-    rows = min(rows, int(cols * (h / w) / 1.9 * 1.0) or rows)
-    small = np.array(Image.fromarray(gray).resize((cols, rows), Image.LANCZOS)) / 255.0
-    parts = [prompt_line(22, 56, "cat portrait.txt", 0.05)]
-    x0 = 18
-    y = top + (avail_h - rows * char_h) / 2
+    gray, alpha = prep_photo(photo)
+    top, bottom = 56 + 12, H - 40
+    char_w = (W - 40) / cols
+    char_h = char_w * 1.75
+    rows = int(round(cols * CROP_ASPECT * char_w / char_h))
+    if rows * char_h > bottom - top:
+        rows = int((bottom - top) / char_h)
+    g = np.array(Image.fromarray((gray * 255).astype("uint8")).resize((cols, rows), Image.LANCZOS)) / 255
+    m = np.array(Image.fromarray((alpha * 255).astype("uint8")).resize((cols, rows), Image.BILINEAR)) / 255
+
+    parts = [prompt_line(22, 56, "cat happy.txt", 0.05)]
+    x0 = (W - cols * char_w) / 2
+    y = top + (bottom - top - rows * char_h) / 2
+    n = len(RAMP) - 1
+    levels = 8
+    shades = [_mix("#30363d", "#f0f6fc", k / (levels - 1)) for k in range(levels)]
     for i in range(rows):
-        line = "".join(RAMP[len(RAMP) - 1 - int(v * (len(RAMP) - 1))] for v in small[i]).rstrip()
-        if not line.strip():
-            y += char_h
-            continue
-        txt = (f'<text x="{x0}" y="{y + char_h * 0.8:.1f}" font-size="{char_h * 0.95:.1f}" fill="#d0d7de" '
-               f'textLength="{len(line) * char_w:.1f}" lengthAdjust="spacingAndGlyphs" xml:space="preserve">{esc(line)}</text>')
-        parts.append(row_group(i, x0, y, len(line) * char_w, char_h, txt, START + i * 0.06))
+        cells = []  # (glyph, shade index)
+        for v, a in zip(g[i], m[i]):
+            if a < 0.35:
+                cells.append((" ", 0))
+            else:
+                cells.append((RAMP[max(1, int(round(v * n)))], min(levels - 1, int(v * levels))))
+        while cells and cells[-1][0] == " ":
+            cells.pop()
+        if any(c != " " for c, _ in cells):
+            # one tspan per run of equal shade keeps the file small
+            spans, run, cur = [], "", cells[0][1]
+            for c, k in cells:
+                if k != cur and c != " ":
+                    spans.append(f'<tspan fill="{shades[cur]}">{esc(run)}</tspan>')
+                    run, cur = "", k
+                run += c
+            spans.append(f'<tspan fill="{shades[cur]}">{esc(run)}</tspan>')
+            txt = (f'<text x="{x0:.1f}" y="{y + char_h * 0.78:.1f}" font-size="{char_h * 0.92:.1f}" '
+                   f'textLength="{len(cells) * char_w:.1f}" lengthAdjust="spacingAndGlyphs" xml:space="preserve">{"".join(spans)}</text>')
+            parts.append(row_group(i, x0, y, len(cells) * char_w, char_h, txt, START + i * 0.045))
         y += char_h
-    done = START + rows * 0.06 + ROW_DUR
-    parts.append(prompt_line(22, H - 30, "", done))
-    parts.append(blinking_cursor(22 + 7.55 * 17, H - 30, done))
+    done = START + rows * 0.045 + ROW_DUR
+    parts.append(prompt_line(22, H - 22, "", done))
+    parts.append(blinking_cursor(22 + 7.55 * 17, H - 22, done))
     return "\n".join(parts)
 
 

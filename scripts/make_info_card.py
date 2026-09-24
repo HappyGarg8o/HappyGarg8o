@@ -29,11 +29,12 @@ CARD = [
         ("ArbScan", "Solana cross-DEX arbitrage scanner"),
         ("Razorpay", "Buildathon 2026 entry"),
     ]),
+    ("Portfolio", "happygarg.vercel.app"),
     ("LinkedIn", "linkedin.com/in/happy-garg"),
 ]
 
 X_KEY, X_VAL, X_DESC = 24, 118, 204
-LINE = 22
+LINE = 21
 FS = 13
 
 
