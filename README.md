@@ -8,7 +8,7 @@
 <h3><code>happy@github ~ $ whoami</code></h3>
 <table>
   <tr>
-    <td valign="top"><img src="./ascii-art.svg" width="370" alt="ASCII portrait of Happy Garg" /></td>
+    <td valign="top"><img src="./ascii-art.svg" width="370" alt="HAPPY GARG in ASCII art" /></td>
     <td valign="top"><a href="https://happygarg.vercel.app/"><img src="./info-card.svg" width="490" alt="Happy Garg: solo technical founder, B.Tech CSE at Galgotias University. Stack: Swift, SwiftUI, React Native, Expo, Supabase, Java, SQL, Python, n8n." /></a></td>
   </tr>
 </table>
