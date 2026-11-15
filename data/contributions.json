@@ -1,10 +1,10 @@
 {
  "user": "HappyGarg8o",
- "updated": "2026-11-14",
- "total": 123,
- "active_days": 56,
- "current_streak": 51,
- "longest_streak": 51,
+ "updated": "2026-11-15",
+ "total": 143,
+ "active_days": 57,
+ "current_streak": 52,
+ "longest_streak": 52,
  "best_day": {
   "date": "2026-09-24",
   "level": 4,
@@ -23,44 +23,9 @@
   "2026-08": 1,
   "2026-09": 36,
   "2026-10": 57,
-  "2026-11": 24
+  "2026-11": 44
  },
  "days": [
-  {
-   "date": "2025-11-09",
-   "level": 0,
-   "count": 0
-  },
-  {
-   "date": "2025-11-10",
-   "level": 0,
-   "count": 0
-  },
-  {
-   "date": "2025-11-11",
-   "level": 0,
-   "count": 0
-  },
-  {
-   "date": "2025-11-12",
-   "level": 0,
-   "count": 0
-  },
-  {
-   "date": "2025-11-13",
-   "level": 0,
-   "count": 0
-  },
-  {
-   "date": "2025-11-14",
-   "level": 0,
-   "count": 0
-  },
-  {
-   "date": "2025-11-15",
-   "level": 0,
-   "count": 0
-  },
   {
    "date": "2025-11-16",
    "level": 0,
@@ -1633,22 +1598,22 @@
   },
   {
    "date": "2026-09-26",
-   "level": 2,
+   "level": 1,
    "count": 3
   },
   {
    "date": "2026-09-27",
-   "level": 4,
+   "level": 3,
    "count": 9
   },
   {
    "date": "2026-09-28",
-   "level": 2,
+   "level": 1,
    "count": 3
   },
   {
    "date": "2026-09-29",
-   "level": 3,
+   "level": 2,
    "count": 5
   },
   {
@@ -1658,22 +1623,22 @@
   },
   {
    "date": "2026-10-01",
-   "level": 3,
+   "level": 2,
    "count": 5
   },
   {
    "date": "2026-10-02",
-   "level": 2,
+   "level": 1,
    "count": 3
   },
   {
    "date": "2026-10-03",
-   "level": 2,
+   "level": 1,
    "count": 3
   },
   {
    "date": "2026-10-04",
-   "level": 2,
+   "level": 1,
    "count": 3
   },
   {
@@ -1688,12 +1653,12 @@
   },
   {
    "date": "2026-10-07",
-   "level": 3,
+   "level": 2,
    "count": 5
   },
   {
    "date": "2026-10-08",
-   "level": 4,
+   "level": 3,
    "count": 9
   },
   {
@@ -1723,7 +1688,7 @@
   },
   {
    "date": "2026-10-14",
-   "level": 2,
+   "level": 1,
    "count": 3
   },
   {
@@ -1828,12 +1793,12 @@
   },
   {
    "date": "2026-11-04",
-   "level": 2,
+   "level": 1,
    "count": 3
   },
   {
    "date": "2026-11-05",
-   "level": 3,
+   "level": 2,
    "count": 5
   },
   {
@@ -1868,16 +1833,21 @@
   },
   {
    "date": "2026-11-12",
-   "level": 3,
-   "count": 6
+   "level": 4,
+   "count": 11
   },
   {
    "date": "2026-11-13",
-   "level": 1,
-   "count": 1
+   "level": 2,
+   "count": 4
   },
   {
    "date": "2026-11-14",
+   "level": 4,
+   "count": 12
+  },
+  {
+   "date": "2026-11-15",
    "level": 0,
    "count": 0
   }
