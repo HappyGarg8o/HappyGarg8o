@@ -1,14 +1,14 @@
 {
  "user": "HappyGarg8o",
- "updated": "2026-11-21",
- "total": 161,
- "active_days": 63,
- "current_streak": 58,
- "longest_streak": 58,
+ "updated": "2026-11-22",
+ "total": 173,
+ "active_days": 64,
+ "current_streak": 59,
+ "longest_streak": 59,
  "best_day": {
-  "date": "2026-09-24",
+  "date": "2026-11-14",
   "level": 4,
-  "count": 13
+  "count": 14
  },
  "months": {
   "2025-11": 0,
@@ -23,44 +23,9 @@
   "2026-08": 1,
   "2026-09": 36,
   "2026-10": 57,
-  "2026-11": 62
+  "2026-11": 74
  },
  "days": [
-  {
-   "date": "2025-11-16",
-   "level": 0,
-   "count": 0
-  },
-  {
-   "date": "2025-11-17",
-   "level": 0,
-   "count": 0
-  },
-  {
-   "date": "2025-11-18",
-   "level": 0,
-   "count": 0
-  },
-  {
-   "date": "2025-11-19",
-   "level": 0,
-   "count": 0
-  },
-  {
-   "date": "2025-11-20",
-   "level": 0,
-   "count": 0
-  },
-  {
-   "date": "2025-11-21",
-   "level": 0,
-   "count": 0
-  },
-  {
-   "date": "2025-11-22",
-   "level": 0,
-   "count": 0
-  },
   {
    "date": "2025-11-23",
    "level": 0,
@@ -1844,7 +1809,7 @@
   {
    "date": "2026-11-14",
    "level": 4,
-   "count": 12
+   "count": 14
   },
   {
    "date": "2026-11-15",
@@ -1878,6 +1843,11 @@
   },
   {
    "date": "2026-11-21",
+   "level": 3,
+   "count": 10
+  },
+  {
+   "date": "2026-11-22",
    "level": 0,
    "count": 0
   }
